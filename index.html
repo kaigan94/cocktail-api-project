@@ -3,10 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Exam - Name</title>
-    <link rel="stylesheet" href="index.css" />
+    <title>Cocktail App</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <div class="navbar">
+      <div class="nav-buttons">
+        <button id="start-link" class="link">Home</button>
+        <button id="search-link" class="link">Search</button>
+      </div>
+    </div>
+
+    <div id="start-page" class="open">
+      <div id="cocktail"></div>
+      <!-- <button id="details-link" class="link">See More</button> -->
+      <button id="new-cocktail">Generate a new cocktail here</button>
+    </div>
+
+    <div id="details-page" class="hidden"></div>
+    <div id="search-page"></div>
+
     <script src="index.js" type="module"></script>
+    <script src="utilities.js"></script>
   </body>
 </html>

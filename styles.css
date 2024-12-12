@@ -1,0 +1,15 @@
+#start-page,
+#details-page,
+#search-page {
+  display: none;
+}
+
+#start-page.open,
+#details-page.open,
+#search-page.open {
+  display: block;
+}
+
+img {
+  width: 300px;
+}
