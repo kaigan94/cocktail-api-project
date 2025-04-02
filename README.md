@@ -7,8 +7,7 @@ You can fetch random drinks, search by name, and view full cocktail details like
 
 ## 🚀 Live Demo
 
-👉 [View the app on Netlify](https://kaigan-cocktail-api.netlify.app/)  
-_(Replace this link with your real one)_
+👉 [View the app on Netlify](https://kaigan-cocktail-app.netlify.app/)
 
 ---
 
