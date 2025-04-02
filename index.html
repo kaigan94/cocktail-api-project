@@ -19,26 +19,28 @@
 
     <!-- Main Content Section -->
     <main class="content">
-      <!-- Home Page -->
-      <section id="start-page" class="page open">
-        <div id="cocktail"></div>
-        <button id="details-link" class="btn">See More</button>
-        <button id="new-cocktail" class="btn">Show Me Another Drink</button>
-      </section>
+      <div class="container">
+        <!-- Home Page -->
+        <section id="start-page" class="page open">
+          <div id="cocktail"></div>
+          <button id="details-link" class="btn">See More</button>
+          <button id="new-cocktail" class="btn">Show Me Another Drink</button>
+        </section>
 
-      <!-- Details Page -->
-      <section id="details-page" class="page hidden">
-        <div id="cocktail-details"></div>
-      </section>
+        <!-- Details Page -->
+        <section id="details-page" class="page hidden">
+          <div id="cocktail-details"></div>
+        </section>
 
-      <!-- Search Page -->
-      <section id="search-page" class="page hidden">
-        <form id="search-form">
-          <input type="text" id="search-input" placeholder="Enter cocktail name" />
-          <button type="submit" id="search-button">Search</button>
-        </form>
-        <ul id="search-results"></ul>
-      </section>
+        <!-- Search Page -->
+        <section id="search-page" class="page hidden">
+          <form id="search-form">
+            <input type="text" id="search-input" placeholder="Enter cocktail name" />
+            <button type="submit" id="search-button">Search</button>
+          </form>
+          <ul id="search-results"></ul>
+        </section>
+      </div>
     </main>
 
     <script src="index.js" type="module"></script>

@@ -1,15 +1,42 @@
+/* Grundlayout */
 body {
-  background-color: #ebb59d;
+  background-color: #e8ac88;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0 10px;
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
 }
 
+/* Wrapper för innehåll */
+.container {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+/* Navigering */
 nav {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
 }
 
+.nav-btn,
+.btn {
+  margin: 4px;
+  padding: 6px 8px;
+  cursor: pointer;
+  min-width: 60px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Sidor */
 #start-page,
 #details-page,
 #search-page {
@@ -22,100 +49,100 @@ nav {
   display: block;
 }
 
-#cocktail-details h2 {
-  text-align: center;
-  text-transform: uppercase;
-  color: #b22222;
-  text-shadow: #777;
-}
-
-ul strong {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-ul {
-  padding-left: 20px;
-  max-width: 100%;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-#cocktail-details {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0 1rem;
-  box-sizing: border-box;
-}
-
-#cocktail-details p,
-#cocktail-details ul {
-  width: 100%;
-  max-width: 400px;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-#cocktail-details p {
-  width: 400px;
-}
-
-img {
-  width: 400px;
-  border-radius: 4px;
-}
-
+/* Header */
 .header-logo {
   display: block;
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
   height: auto;
   margin-bottom: 10px;
 }
 
 h1 {
   text-align: center;
-  font-family: Arial, Helvetica, sans-serif;
   font-size: 28px;
   text-transform: uppercase;
   text-shadow: 0 0 3px #ff0000;
 }
 
 h2 {
-  font-family: Arial, Helvetica, sans-serif;
   font-size: 28px;
   text-transform: uppercase;
   text-shadow: 0 0 2px #990000;
+  text-align: center;
+  color: #b22222;
 }
 
-p {
-  font-family: Arial, Helvetica, sans-serif;
+/* Detaljer */
+#cocktail-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#cocktail-details p {
+  width: 100%;
+  max-width: 400px;
   font-size: 16px;
+}
+
+ul strong {
+  font-weight: bold;
+}
+
+/* Bild */
+img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 4px;
+}
+
+/* Sökformulär */
+#search-form {
+  margin-top: 10px;
+  width: 100%;
+  max-width: 400px;
+}
+
+#search-input {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  margin-bottom: 5px;
+}
+
+#search-button {
+  width: 100%;
+  padding: 10px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+/* Sökresultat */
+#search-results {
+  cursor: pointer;
+  width: 100%;
+  max-width: 400px;
+  padding: 0;
+  list-style-type: square;
 }
 
 li {
   margin: 10px;
-  font-family: Arial, Helvetica, sans-serif;
   font-size: 16px;
-  list-style-type: square;
 }
 
-.nav-btn {
-  margin: 2px;
-  cursor: pointer;
-}
+/* Responsivitet */
+@media (max-width: 600px) {
+  h1,
+  h2 {
+    font-size: 22px;
+  }
 
-.btn {
-  cursor: pointer;
-}
-
-#search-form {
-  margin-top: 5px;
-}
-
-#search-button {
-  cursor: pointer;
-}
-
-#search-results {
-  cursor: pointer;
+  p,
+  li,
+  .btn,
+  .nav-btn {
+    font-size: 14px;
+  }
 }
