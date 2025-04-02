@@ -4,30 +4,43 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cocktail App</title>
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
-      rel="stylesheet"
-    />
     <link rel="stylesheet" href="styles.css" />
   </head>
+
   <body>
-    <div class="navbar">
-      <div class="nav-buttons">
-        <button id="start-link" class="link">Home</button>
-        <button id="search-link" class="link">Search</button>
-      </div>
-    </div>
+    <!-- Header Section -->
+    <header class="header">
+      <img src="logo.png" alt="Image of TheCocktailDB logo" class="header-logo" />
+      <nav class="navbar">
+        <button id="start-link" class="nav-btn">Home</button>
+        <button id="search-link" class="nav-btn">Search Cocktail</button>
+      </nav>
+    </header>
 
-    <div id="start-page" class="open">
-      <div id="cocktail"></div>
-      <!-- <button id="details-link" class="link">See More</button> -->
-      <button id="new-cocktail">Generate a new cocktail here</button>
-    </div>
+    <!-- Main Content Section -->
+    <main class="content">
+      <!-- Home Page -->
+      <section id="start-page" class="page open">
+        <div id="cocktail"></div>
+        <button id="details-link" class="btn">See More</button>
+        <button id="new-cocktail" class="btn">Show Me Another Drink</button>
+      </section>
 
-    <div id="details-page" class="hidden"></div>
-    <div id="search-page"></div>
+      <!-- Details Page -->
+      <section id="details-page" class="page hidden">
+        <div id="cocktail-details"></div>
+      </section>
+
+      <!-- Search Page -->
+      <section id="search-page" class="page hidden">
+        <form id="search-form">
+          <input type="text" id="search-input" placeholder="Enter cocktail name" />
+          <button type="submit" id="search-button">Search</button>
+        </form>
+        <ul id="search-results"></ul>
+      </section>
+    </main>
 
     <script src="index.js" type="module"></script>
-    <script src="utilities.js"></script>
   </body>
 </html>

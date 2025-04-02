@@ -1,3 +1,15 @@
+body {
+  background-color: #ebb59d;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+nav {
+  display: flex;
+  justify-content: center;
+}
+
 #start-page,
 #details-page,
 #search-page {
@@ -10,6 +22,83 @@
   display: block;
 }
 
+#cocktail-details h2 {
+  text-align: center;
+  text-transform: uppercase;
+  color: #b22222;
+  text-shadow: #777;
+}
+
+ul strong {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+#cocktail-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#cocktail-details p {
+  width: 400px;
+}
+
 img {
+  width: 400px;
+  border-radius: 4px;
+}
+
+.header-logo {
+  display: block;
   width: 300px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+h1 {
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 28px;
+  text-transform: uppercase;
+  text-shadow: 0 0 3px #ff0000;
+}
+
+h2 {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 28px;
+  text-transform: uppercase;
+  text-shadow: 0 0 2px #990000;
+}
+
+p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+}
+
+li {
+  margin: 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 16px;
+  list-style-type: square;
+}
+
+.nav-btn {
+  margin: 2px;
+  cursor: pointer;
+}
+
+.btn {
+  cursor: pointer;
+}
+
+#search-form {
+  margin-top: 5px;
+}
+
+#search-button {
+  cursor: pointer;
+}
+
+#search-results {
+  cursor: pointer;
 }
