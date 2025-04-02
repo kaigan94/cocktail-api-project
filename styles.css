@@ -33,10 +33,27 @@ ul strong {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+ul {
+  padding-left: 20px;
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
 #cocktail-details {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+#cocktail-details p,
+#cocktail-details ul {
+  width: 100%;
+  max-width: 400px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 #cocktail-details p {
