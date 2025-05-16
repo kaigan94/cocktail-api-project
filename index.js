@@ -31,10 +31,12 @@ function extractIngredients(raw) {
 // ======================
 function showLoader() {
   document.getElementById("loader").classList.remove("hidden");
+  document.body.classList.add("overflow-hidden");
 }
 
 function hideLoader() {
   document.getElementById("loader").classList.add("hidden");
+  document.body.classList.remove("overflow-hidden");
 }
 
 function showError(message) {
@@ -57,16 +59,40 @@ const menuToggle = document.getElementById("menu-toggle");
 const navLinks = document.getElementById("nav-links");
 const navButtons = document.querySelectorAll("#nav-links button");
 const menuOverlay = document.getElementById("menu-overlay");
+const logo = document.querySelector("header img");
 
+const pages = {
+  start: document.querySelector("#start-page"),
+  details: document.querySelector("#details-page"),
+  search: document.querySelector("#search-page"),
+  favorites: document.querySelector("#favorites-page"),
+};
+
+// ======================
+// Mobile Menu Event Listeners
+// ======================
 menuToggle?.addEventListener("click", () => {
   const isHidden = navLinks?.classList.contains("hidden");
-
   if (isHidden) {
     navLinks?.classList.remove("hidden", "opacity-0", "translate-y-[-10px]");
     navLinks?.classList.add("opacity-100", "translate-y-0");
     menuOverlay?.classList.remove("opacity-0", "hidden");
     setTimeout(() => menuOverlay?.classList.add("opacity-100"), 10);
   } else {
+    navLinks?.classList.add("opacity-0", "translate-y-[-10px]");
+    setTimeout(() => navLinks?.classList.add("hidden"), 300);
+    menuOverlay?.classList.remove("opacity-100");
+    setTimeout(() => menuOverlay?.classList.add("hidden", "opacity-0"), 300);
+  }
+});
+
+document.addEventListener("click", (e) => {
+  const isInsideMenu = navLinks?.contains(e.target);
+  const isToggleButton = menuToggle?.contains(e.target);
+  const isLogo = logo?.contains(e.target);
+  const isOpen = window.innerWidth < 640 && !navLinks?.classList.contains("hidden");
+
+  if (!isInsideMenu && !isToggleButton && !isLogo && isOpen) {
     navLinks?.classList.add("opacity-0", "translate-y-[-10px]");
     setTimeout(() => navLinks?.classList.add("hidden"), 300);
     menuOverlay?.classList.remove("opacity-100");
@@ -85,31 +111,60 @@ navButtons?.forEach((btn) => {
   });
 });
 
-document.addEventListener("click", (e) => {
-  const isInside = navLinks?.contains(e.target) || menuToggle?.contains(e.target);
-  if (!isInside && window.innerWidth < 640) {
-    navLinks?.classList.add("opacity-0", "translate-y-[-10px]");
-    setTimeout(() => navLinks?.classList.add("hidden"), 300);
-    menuOverlay?.classList.remove("opacity-100");
-    setTimeout(() => menuOverlay?.classList.add("hidden", "opacity-0"), 300);
-  }
-});
-
 window.addEventListener("resize", () => {
   if (window.innerWidth >= 640) {
-    navLinks?.classList.remove("hidden");
-    navLinks?.classList.remove("opacity-0", "translate-y-[-10px]");
+    navLinks?.classList.remove("hidden", "opacity-0", "translate-y-[-10px]");
     navLinks?.classList.add("opacity-100", "translate-y-0");
     menuOverlay?.classList.add("hidden", "opacity-0");
   }
 });
 
-const pages = {
-  start: document.querySelector("#start-page"),
-  details: document.querySelector("#details-page"),
-  search: document.querySelector("#search-page"),
-  favorites: document.querySelector("#favorites-page"),
-};
+// ======================
+// Logo Click to Home
+// ======================
+logo?.addEventListener("click", () => {
+  localStorage.setItem("lastPage", "start");
+  const lastRandomDrink = JSON.parse(localStorage.getItem("lastRandomDrink"));
+  if (lastRandomDrink) {
+    displayCocktail(lastRandomDrink);
+  } else {
+    fetchRandomCocktail();
+  }
+  switchPage("start");
+});
+
+// ======================
+// Favorite Toggle Functions
+// ======================
+function toggleFavorite(cocktail, favIcon, favText, undoBtn) {
+  let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+  const index = favorites.findIndex((f) => f.id === cocktail.id);
+
+  if (index === -1) {
+    favorites.push({ id: cocktail.id, name: cocktail.name, thumbnail: cocktail.thumbnail });
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    favIcon.classList.remove("bi-heart");
+    favIcon.classList.add("bi-heart-fill");
+    favText.textContent = "Added to Favorites";
+    favText.classList.remove("hidden");
+    favText.classList.add("opacity-100");
+    undoBtn?.classList.remove("hidden");
+  }
+}
+
+function undoFavorite(cocktail, favIcon, favText, undoBtn) {
+  let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+  const index = favorites.findIndex((f) => f.id === cocktail.id);
+  if (index > -1) {
+    favorites.splice(index, 1);
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    favIcon.classList.remove("bi-heart-fill");
+    favIcon.classList.add("bi-heart");
+    favText.classList.add("hidden");
+    favText.classList.remove("opacity-100");
+    undoBtn?.classList.add("hidden");
+  }
+}
 
 // ======================
 // Fetch Functions
@@ -181,9 +236,121 @@ function displayCocktail(cocktail) {
   const searchForm = document.getElementById("search-form");
   searchForm.style.display = "none";
   cocktailDiv.innerHTML = `
-<h1 class="text-2xl font-bold text-orange-600 mb-6">${cocktail.strDrink}</h1>
+    <h1 class="text-2xl font-bold text-orange-600 mb-6">${cocktail.strDrink}</h1>
     <img src="${cocktail.strDrinkThumb}" alt="${cocktail.strDrink}" data-id="${cocktail.idDrink}" class="rounded-lg shadow-md max-w-xs object-contain" />
   `;
+
+  const detailsBtn = document.getElementById("details-link");
+  const handler = () => {
+    const cocktailImg = document.querySelector("#cocktail img");
+    if (!cocktailImg) return;
+    const drinkId = cocktailImg.getAttribute("data-id");
+    if (!drinkId) return;
+    cameFrom = "start";
+    localStorage.setItem("lastPage", "details");
+    fetchCocktailDetailsById(drinkId);
+  };
+
+  // Rensa tidigare lyssnare med ett nytt element
+  const newDetailsBtn = detailsBtn.cloneNode(true);
+  detailsBtn.parentNode.replaceChild(newDetailsBtn, detailsBtn);
+  newDetailsBtn.addEventListener("click", handler);
+}
+
+function displayCocktailDetails(cocktail) {
+  const detailsDiv = document.getElementById("cocktail-details");
+  detailsDiv.innerHTML = `
+     <div class="relative bg-white rounded-xl shadow-lg pt-16 pb-10 px-6 sm:px-10 w-full max-w-md mx-auto flex flex-col items-center space-y-6 animate-fade-in">
+    <div class="absolute top-4 left-4 z-10 flex flex-col items-start">
+      <button id="fav-btn" title="Add to favorites"
+        class="bg-stone-200 text-black text-sm py-1 px-2 rounded hover:bg-stone-400 transition flex items-center">
+        <i id="fav-icon" class="bi text-lg text-red-500"></i>
+        <span id="fav-text" class="ml-2 text-sm font-medium hidden opacity-0 transition-opacity duration-500">Added to Favorites</span>
+      </button>
+      <button id="undo-fav-btn" class="ml-2 text-xs text-red-600 underline hidden mt-1">Remove from Favorites</button>
+    </div>
+
+      <h2 class="text-2xl font-bold text-orange-600 text-center">${cocktail.name}</h2>
+      <img src="${cocktail.thumbnail}" alt="${cocktail.name}" class="rounded-lg max-w-full object-contain shadow" />
+
+      <div class="text-left w-full text-gray-800 space-y-2">
+        <p><span class="font-semibold">Category:</span> ${cocktail.category}</p>
+        <p><span class="font-semibold">Alcoholic:</span> ${cocktail.alcoholic}</p>
+        <p><span class="font-semibold">Glass:</span> ${cocktail.glass}</p>
+        <p><span class="font-semibold">Instructions:</span> ${cocktail.instructions}</p>
+        <p class="font-semibold mt-4">Ingredients:</p>
+        <ul class="list-disc list-inside space-y-1 text-sm">
+          ${cocktail.ingredients.map((i) => `<li>${i.measure || ""} ${i.ingredient}</li>`).join("")}
+        </ul>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
+        <button id="back-to-search" class="hidden bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 transition">← Back to Search</button>
+        <button id="back-to-home" class="hidden bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 transition">← Back to Home</button>
+        <button id="back-to-favorites" class="hidden bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 transition">← Back to Favorites</button>
+      </div>
+    </div>
+  `;
+
+  const favBtn = document.getElementById("fav-btn");
+  const favIcon = document.getElementById("fav-icon");
+  const favText = document.getElementById("fav-text");
+  const undoBtn = document.getElementById("undo-fav-btn");
+
+  const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+  const isAlreadyFavorite = favorites.some((f) => f.id === cocktail.id);
+
+  if (isAlreadyFavorite) {
+    favIcon.classList.remove("bi-heart");
+    favIcon.classList.add("bi-heart-fill");
+    favText.textContent = "Added to Favorites";
+    favText.classList.remove("hidden");
+    favText.classList.add("opacity-100");
+    undoBtn.classList.remove("hidden");
+  } else {
+    favIcon.classList.remove("bi-heart-fill");
+    favIcon.classList.add("bi-heart");
+    favText.classList.add("hidden");
+    undoBtn.classList.add("hidden");
+  }
+
+  // 🧡 Klick på hjärtat = toggle
+  favBtn.addEventListener("click", () => {
+    toggleFavorite(cocktail, favIcon, favText, undoBtn);
+  });
+
+  // 💔 Klick på undo = ta bort
+  undoBtn.addEventListener("click", () => {
+    undoFavorite(cocktail, favIcon, favText, undoBtn);
+  });
+
+  const backToSearchBtn = document.getElementById("back-to-search");
+  const backToHomeBtn = document.getElementById("back-to-home");
+  const backToFavoritesBtn = document.getElementById("back-to-favorites");
+
+  favBtn.addEventListener("click", () => {
+    toggleFavorite(cocktail, favIcon, favText, favBtn);
+  });
+
+  if (cameFrom === "search") {
+    backToSearchBtn.classList.remove("hidden");
+  } else if (cameFrom === "favorites") {
+    backToFavoritesBtn.classList.remove("hidden");
+  } else {
+    backToHomeBtn.classList.remove("hidden");
+  }
+
+  backToSearchBtn.onclick = () => switchPage("search");
+  backToHomeBtn.onclick = () => switchPage("start");
+  backToFavoritesBtn.onclick = () => switchPage("favorites");
+
+  favBtn.addEventListener("click", () => {
+    toggleFavorite(cocktail, favIcon, favText, favBtn, undoBtn);
+  });
+
+  undoBtn.addEventListener("click", () => {
+    undoFavorite(cocktail, favIcon, favText, undoBtn);
+  });
 }
 
 function displaySearchResults(cocktails) {
@@ -240,9 +407,9 @@ function displayFavorites() {
     item.innerHTML = `
       <div class="flex justify-between items-start w-full">
         <h3 class="text-lg font-bold text-center">${fav.name}</h3>
-      <button data-id="${fav.id}" class="remove-fav text-red-500 hover:text-red-700 text-xl ml-4">
+        <button data-id="${fav.id}" class="remove-fav text-red-500 hover:text-red-700 text-xl ml-4">
           <i class="bi bi-trash-fill"></i>
-      </button>
+        </button>
       </div>
       <img src="${fav.thumbnail}" alt="${fav.name}" class="rounded max-h-40 object-contain mt-2 cursor-pointer" />
     `;
@@ -260,15 +427,6 @@ function displayFavorites() {
 
     favoritesList.appendChild(item);
   });
-}
-
-// Fade out när man tar bort favorit
-function animateRemoveFavorite(id, item) {
-  item.classList.remove("animate-fade-in");
-  item.classList.add("animate-fade-out");
-  setTimeout(() => {
-    removeFavorite(id);
-  }, 300);
 }
 
 function removeFavorite(id) {
@@ -352,6 +510,19 @@ document.getElementById("clear-search").addEventListener("click", () => {
 window.addEventListener("DOMContentLoaded", () => {
   hideLoader();
 
+  // 🔒 Göm mobilmeny säkert på laddning
+  if (window.innerWidth < 640) {
+    navLinks?.classList.add("hidden", "opacity-0", "translate-y-[-10px]");
+    navLinks?.classList.remove("opacity-100", "translate-y-0");
+    menuOverlay?.classList.add("hidden", "opacity-0");
+    menuOverlay?.classList.remove("opacity-100");
+  } else {
+    navLinks?.classList.remove("hidden", "opacity-0", "translate-y-[-10px]");
+    navLinks?.classList.add("opacity-100", "translate-y-0");
+    menuOverlay?.classList.add("hidden", "opacity-0");
+  }
+
+  // 🚀 Ladda rätt vy
   const lastPage = localStorage.getItem("lastPage") || "start";
   const lastRandomDrink = JSON.parse(localStorage.getItem("lastRandomDrink"));
 
@@ -361,11 +532,10 @@ window.addEventListener("DOMContentLoaded", () => {
     displayFavorites();
     switchPage("favorites");
   } else {
-    // Hem-sidan (start)
     if (lastRandomDrink) {
-      displayCocktail(lastRandomDrink); // Visa sparade drinken
+      displayCocktail(lastRandomDrink);
     } else {
-      fetchRandomCocktail(); // Om ingen finns, hämta ny
+      fetchRandomCocktail();
     }
     switchPage("start");
   }
