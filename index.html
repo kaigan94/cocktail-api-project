@@ -1,47 +1,155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="min-h-screen bg-[#1b1b1b]">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cocktail App</title>
+    <title>Cocktail Explorer</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css" />
+    <style>
+      html,
+      body {
+        min-height: 100%;
+        background: #1b1b1b;
+      }
+      .page {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+        pointer-events: none;
+        position: absolute;
+        width: 100%;
+      }
+      .page.open {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+        position: relative;
+      }
+      h1,
+      h2,
+      h3 {
+        color: #ff7b00; /* mjuk orange */
+        text-shadow: 0 0 2px rgba(255, 123, 0, 0.3); /* subtilt glow */
+      }
+    </style>
   </head>
+  <body class="min-h-screen flex flex-col items-center px-4 text-[#fefefe] relative">
+    <header class="w-full bg-white shadow-lg shadow-gray-700/50 fixed top-0 z-50">
+      <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+        <!-- Logo -->
+        <div class="flex items-center">
+          <img class="h-16 w-auto" src="cocktail-logo.png" alt="Cocktail Explorer Logo" />
+        </div>
 
-  <body>
-    <!-- Header Section -->
-    <header class="header">
-      <img src="logo.png" alt="Image of TheCocktailDB logo" class="header-logo" />
-      <nav class="navbar">
-        <button id="start-link" class="nav-btn">Home</button>
-        <button id="search-link" class="nav-btn">Search Cocktail</button>
-      </nav>
+        <!-- Hamburger Icon (mobile only) -->
+        <button id="menu-toggle" class="sm:hidden text-[#ff9129] text-3xl focus:outline-none">
+          <i class="bi bi-list"></i>
+        </button>
+
+        <!-- Navigation Links -->
+        <nav
+          id="nav-links"
+          class="transition-all duration-300 ease-out opacity-0 translate-y-[-10px] flex-col sm:flex sm:flex-row sm:items-center sm:space-x-4 hidden sm:!flex absolute sm:static top-24 left-0 w-full sm:w-auto bg-white sm:bg-transparent shadow-md sm:shadow-none z-40"
+        >
+          <button
+            id="start-link"
+            class="flex items-center justify-center gap-2 text-[#ff9129] font-semibold border-t sm:border border-[#ff9129] px-4 py-3 sm:py-2 sm:rounded-lg hover:text-[#ff6d00] hover:border-[#ff6d00] transition w-full sm:w-auto"
+          >
+            <i class="bi bi-house-door"></i> Home
+          </button>
+          <button
+            id="search-link"
+            class="flex items-center justify-center gap-2 text-[#ff9129] font-semibold border-t sm:border border-[#ff9129] px-4 py-3 sm:py-2 sm:rounded-lg hover:text-[#ff6d00] hover:border-[#ff6d00] transition w-full sm:w-auto"
+          >
+            <i class="bi bi-search"></i> Search
+          </button>
+          <button
+            id="favorites-link"
+            class="flex items-center justify-center gap-2 text-[#ff9129] font-semibold border-t sm:border border-[#ff9129] px-4 py-3 sm:py-2 sm:rounded-lg hover:text-[#ff6d00] hover:border-[#ff6d00] transition w-full sm:w-auto"
+          >
+            <i class="bi bi-heart"></i> Favorites
+          </button>
+        </nav>
+      </div>
     </header>
 
-    <!-- Main Content Section -->
-    <main class="content">
-      <div class="container">
-        <!-- Home Page -->
-        <section id="start-page" class="page open">
-          <div id="cocktail"></div>
-          <button id="details-link" class="btn">See More</button>
-          <button id="new-cocktail" class="btn">Show Me Another Drink</button>
-        </section>
+    <div id="menu-overlay" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-30 sm:hidden transition-opacity duration-300 opacity-0"></div>
 
-        <!-- Details Page -->
-        <section id="details-page" class="page hidden">
-          <div id="cocktail-details"></div>
-        </section>
+    <div class="mt-[130px] sm:mt-36"></div>
 
-        <!-- Search Page -->
-        <section id="search-page" class="page hidden">
-          <form id="search-form">
-            <input type="text" id="search-input" placeholder="Enter cocktail name" />
-            <button type="submit" id="search-button">Search</button>
-          </form>
-          <ul id="search-results"></ul>
-        </section>
+    <main class="flex flex-col items-center w-full relative z-10">
+      <div
+        class="bg-[#2a2a2a] border-4 border-[#ff9129] rounded-2xl shadow-2xl shadow-orange-400/20 px-6 pt-10 pb-12 mb-20 w-full max-w-6xl flex flex-col items-center"
+      >
+        <div id="loader" class="hidden">
+          <div class="glass">
+            <div class="bubble"></div>
+            <div class="bubble"></div>
+            <div class="bubble"></div>
+            <div class="bubble"></div>
+          </div>
+        </div>
+
+        <div id="error-message" class="hidden text-white bg-red-700 font-semibold p-4 rounded my-4 w-full text-center"></div>
+
+        <div class="container flex flex-col items-center w-full max-w-5xl relative">
+          <section id="start-page" class="page open flex flex-col items-center w-full">
+            <div id="cocktail" class="flex flex-col items-center mb-8"></div>
+            <div class="flex gap-6">
+              <button id="details-link" class="bg-[#ff9129] text-white font-bold py-2 px-6 rounded-xl shadow-md hover:bg-[#ff6d00] transition">
+                More Details
+              </button>
+              <button id="new-cocktail" class="bg-[#ff9129] text-white font-bold py-2 px-6 rounded-xl shadow-md hover:bg-[#ff6d00] transition">
+                Next Cocktail
+              </button>
+            </div>
+          </section>
+
+          <section id="details-page" class="page hidden flex flex-col items-center w-full">
+            <div id="cocktail-details" class="w-full"></div>
+          </section>
+
+          <section id="search-page" class="page hidden w-full flex justify-center pt-6">
+            <div class="flex flex-col items-center bg-[#2a2a2a] rounded-xl shadow-xl shadow-orange-400/10 px-12 pt-12 pb-8 w-full max-w-xl">
+              <form id="search-form" class="w-full flex flex-col gap-2 mb-4">
+                <div class="flex justify-between items-center w-full">
+                  <button type="button" id="clear-search" class="text-sm text-[#ff9129] underline hover:text-[#ff6d00] transition">Clear</button>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2">
+                  <div class="relative w-full">
+                    <i class="bi bi-search absolute left-3 top-1.5 text-gray-400 text-lg"></i>
+                    <input
+                      type="text"
+                      id="search-input"
+                      placeholder="Enter cocktail name"
+                      autocomplete="off"
+                      class="w-full pl-10 p-2 border rounded focus:outline-none bg-[#1e1e1e] text-[#fefefe]"
+                    />
+                  </div>
+                  <button type="submit" id="search-button" class="bg-[#ff9129] text-white font-bold py-2 px-4 rounded hover:bg-[#ff6d00] transition">
+                    Search
+                  </button>
+                </div>
+              </form>
+              <p id="search-label" class="text-sm text-[#ff9129] mb-2 hidden"></p>
+              <ul id="search-results" class="w-full grid grid-cols-1 md:grid-cols-2 gap-4"></ul>
+            </div>
+          </section>
+
+          <section id="favorites-page" class="page hidden flex flex-col items-center w-full pt-8">
+            <h2 class="text-2xl font-bold text-[#ff9129] mb-6">My Favorites</h2>
+            <ul id="favorites-list" class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl text-center"></ul>
+          </section>
+        </div>
       </div>
     </main>
+
+    <footer class="mt-auto pt- text-center text-sm text-gray-500 flex flex-col items-center relative z-0">
+      <p>Cocktail Explorer &copy; 2025</p>
+      <p class="mt-2 pb-2 flex items-center justify-center gap-2">Powered by <img src="logo.png" alt="TheCocktailDB Logo" class="inline-block w-24" /></p>
+    </footer>
 
     <script src="index.js" type="module"></script>
   </body>
