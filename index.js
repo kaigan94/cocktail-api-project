@@ -72,14 +72,15 @@ const pages = {
 // Mobile Menu Event Listeners
 // ======================
 menuToggle?.addEventListener("click", () => {
-  const isHidden = navLinks?.classList.contains("hidden");
-  if (isHidden) {
-    navLinks?.classList.remove("hidden", "opacity-0", "translate-y-[-10px]");
-    navLinks?.classList.add("opacity-100", "translate-y-0");
-    menuOverlay?.classList.remove("opacity-0", "hidden");
+  const isOpen = navLinks?.classList.contains("mobile-menu-open");
+
+  if (!isOpen) {
+    navLinks?.classList.remove("hidden");
+    navLinks?.classList.add("mobile-menu-open");
+    menuOverlay?.classList.remove("hidden", "opacity-0");
     setTimeout(() => menuOverlay?.classList.add("opacity-100"), 10);
   } else {
-    navLinks?.classList.add("opacity-0", "translate-y-[-10px]");
+    navLinks?.classList.remove("mobile-menu-open");
     setTimeout(() => navLinks?.classList.add("hidden"), 300);
     menuOverlay?.classList.remove("opacity-100");
     setTimeout(() => menuOverlay?.classList.add("hidden", "opacity-0"), 300);
@@ -170,14 +171,21 @@ function undoFavorite(cocktail, favIcon, favText, undoBtn) {
 // Fetch Functions
 // ======================
 async function fetchRandomCocktail() {
-  document.getElementById("search-results").innerHTML = "";
+  const currentDrink = JSON.parse(localStorage.getItem("lastRandomDrink"));
   showLoader();
   hideError();
+
   try {
     const response = await fetch("https://www.thecocktaildb.com/api/json/v1/1/random.php");
     if (!response.ok) throw new Error("Failed to fetch random cocktail.");
     const data = await response.json();
     if (!data.drinks || !data.drinks[0]) throw new Error("No cocktail found.");
+
+    // Spara nuvarande som "previous"
+    if (currentDrink) {
+      localStorage.setItem("previousDrink", JSON.stringify(currentDrink));
+      document.getElementById("prev-cocktail").classList.remove("hidden");
+    }
 
     localStorage.setItem("lastRandomDrink", JSON.stringify(data.drinks[0]));
     displayCocktail(data.drinks[0]);
@@ -228,6 +236,35 @@ async function fetchCocktailsByName(cocktailName) {
   }
 }
 
+// By ingredient
+async function fetchCocktailsByIngredient(ingredient) {
+  showLoader();
+  hideError();
+  try {
+    const response = await fetch(`https://www.thecocktaildb.com/api/json/v1/1/filter.php?i=${ingredient}`);
+    const data = await response.json();
+    const cocktails = data.drinks || [];
+
+    if (cocktails.length) {
+      displaySearchResults(cocktails);
+    } else {
+      displayNoResults();
+    }
+  } catch (error) {
+    console.error(error);
+    showError("Couldn't search by ingredient. Please try again.");
+  } finally {
+    hideLoader();
+  }
+}
+
+// ======================
+// Drink Title Style Helper (optional enhancement)
+// ======================
+function stylizeDrinkTitle(title) {
+  return `<h1 class="text-2xl font-extrabold tracking-wide text-orange-600 text-center mb-6 border-b-4 border-orange-300 inline-block pb-1">${title}</h1>`;
+}
+
 // ======================
 // Display Functions
 // ======================
@@ -236,9 +273,9 @@ function displayCocktail(cocktail) {
   const searchForm = document.getElementById("search-form");
   searchForm.style.display = "none";
   cocktailDiv.innerHTML = `
-    <h1 class="text-2xl font-bold text-orange-600 mb-6">${cocktail.strDrink}</h1>
-    <img src="${cocktail.strDrinkThumb}" alt="${cocktail.strDrink}" data-id="${cocktail.idDrink}" class="rounded-lg shadow-md max-w-xs object-contain" />
-  `;
+  ${stylizeDrinkTitle(cocktail.strDrink)}
+  <img src="${cocktail.strDrinkThumb}" alt="${cocktail.strDrink}" data-id="${cocktail.idDrink}" class="rounded-xl shadow-md max-w-xs object-contain" />
+`;
 
   const detailsBtn = document.getElementById("details-link");
   const handler = () => {
@@ -260,35 +297,52 @@ function displayCocktail(cocktail) {
 function displayCocktailDetails(cocktail) {
   const detailsDiv = document.getElementById("cocktail-details");
   detailsDiv.innerHTML = `
-     <div class="relative bg-white rounded-xl shadow-lg pt-16 pb-10 px-6 sm:px-10 w-full max-w-md mx-auto flex flex-col items-center space-y-6 animate-fade-in">
-    <div class="absolute top-4 left-4 z-10 flex flex-col items-start">
-      <button id="fav-btn" title="Add to favorites"
-        class="bg-stone-200 text-black text-sm py-1 px-2 rounded hover:bg-stone-400 transition flex items-center">
-        <i id="fav-icon" class="bi text-lg text-red-500"></i>
-        <span id="fav-text" class="ml-2 text-sm font-medium hidden opacity-0 transition-opacity duration-500">Added to Favorites</span>
-      </button>
-      <button id="undo-fav-btn" class="ml-2 text-xs text-red-600 underline hidden mt-1">Remove from Favorites</button>
+    <div class="relative bg-white rounded-xl shadow-lg pt-16 pb-10 px-6 sm:px-10 w-full max-w-md mx-auto flex flex-col items-center space-y-6 animate-fade-in">
+<div class="absolute top-6 right-4 z-10 flex flex-col items-end gap-2 pr-1 pt-1">
+      <button id="back-to-search" class="hidden bg-orange-500 text-white py-2 px-3 rounded hover:bg-orange-600 transition text-sm">← Back</button>
+      <button id="back-to-home" class="hidden bg-orange-500 text-white py-2 px-3 rounded hover:bg-orange-600 transition text-sm">← Back</button>
+      <button id="back-to-favorites" class="hidden bg-orange-500 text-white py-2 px-3 rounded hover:bg-orange-600 transition text-sm">← Back</button>
     </div>
 
-      <h2 class="text-2xl font-bold text-orange-600 text-center">${cocktail.name}</h2>
-      <img src="${cocktail.thumbnail}" alt="${cocktail.name}" class="rounded-lg max-w-full object-contain shadow" />
+<div class="absolute top-0 left-4 z-10 flex flex-col items-start gap-1 pt-1">
+  <button id="fav-btn" title="Add to favorites"
+    class="bg-stone-200 text-black text-sm py-1 px-2 rounded hover:bg-stone-400 transition flex items-center">
+    <i id="fav-icon" class="bi text-lg text-red-500"></i>
+    <span id="fav-text" class="ml-2 text-sm font-medium hidden opacity-0 transition-opacity duration-500">Added to Favorites</span>
+  </button>
+  <button id="undo-fav-btn" class="text-xs text-red-600 underline hidden">Remove from Favorites</button>
+</div>
 
-      <div class="text-left w-full text-gray-800 space-y-2">
-        <p><span class="font-semibold">Category:</span> ${cocktail.category}</p>
-        <p><span class="font-semibold">Alcoholic:</span> ${cocktail.alcoholic}</p>
-        <p><span class="font-semibold">Glass:</span> ${cocktail.glass}</p>
-        <p><span class="font-semibold">Instructions:</span> ${cocktail.instructions}</p>
-        <p class="font-semibold mt-4">Ingredients:</p>
-        <ul class="list-disc list-inside space-y-1 text-sm">
-          ${cocktail.ingredients.map((i) => `<li>${i.measure || ""} ${i.ingredient}</li>`).join("")}
-        </ul>
-      </div>
 
-      <div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
-        <button id="back-to-search" class="hidden bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 transition">← Back to Search</button>
-        <button id="back-to-home" class="hidden bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 transition">← Back to Home</button>
-        <button id="back-to-favorites" class="hidden bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 transition">← Back to Favorites</button>
-      </div>
+<h2 class="text-xl font-bold text-orange-600 text-center pt-8">${cocktail.name}</h2>
+      <img src="${cocktail.thumbnail}" alt="${cocktail.name}" class="rounded-xl max-w-xs object-contain shadow mx-auto" />
+
+      <div class="text-left w-full text-gray-800 space-y-2 text-sm">
+  <div class="flex items-start gap-x-3">
+    <i class="bi bi-tags text-orange-600"></i>
+    <p><span class="font-semibold">Category:</span> ${cocktail.category}</p>
+  </div>
+  <div class="flex items-start gap-x-3">
+    <i class="bi bi-cup-straw text-orange-600"></i>
+    <p><span class="font-semibold">Alcoholic:</span> ${cocktail.alcoholic}</p>
+  </div>
+  <div class="flex items-start gap-x-3">
+    <i class="bi bi-cup text-orange-600"></i>
+    <p><span class="font-semibold">Glass:</span> ${cocktail.glass}</p>
+  </div>
+  <div class="flex items-start gap-x-3">
+    <i class="bi bi-list-check text-orange-600"></i>
+    <p><span class="font-semibold">Instructions:</span> ${cocktail.instructions}</p>
+  </div>
+  <div class="flex items-start gap-x-3 mt-4">
+    <i class="bi bi-card-list text-orange-600"></i>
+    <p class="font-semibold">Ingredients:</p>
+  </div>
+  <ul class="list-disc list-inside space-y-1 pl-7">
+    ${cocktail.ingredients.map((i) => `<li>${i.measure || ""} ${i.ingredient}</li>`).join("")}
+  </ul>
+</div>
+
     </div>
   `;
 
@@ -314,12 +368,12 @@ function displayCocktailDetails(cocktail) {
     undoBtn.classList.add("hidden");
   }
 
-  // 🧡 Klick på hjärtat = toggle
+  // 🧡 Klick på hjärt = toggle
   favBtn.addEventListener("click", () => {
     toggleFavorite(cocktail, favIcon, favText, undoBtn);
   });
 
-  // 💔 Klick på undo = ta bort
+  // Undo-knapp
   undoBtn.addEventListener("click", () => {
     undoFavorite(cocktail, favIcon, favText, undoBtn);
   });
@@ -388,7 +442,8 @@ function displayFavorites() {
   favoritesList.innerHTML = "";
 
   if (favorites.length === 0) {
-    favoritesList.className = "flex flex-col items-center justify-center text-center min-h-[200px]";
+    favoritesList.className = "flex flex-col items-center gap-6 w-full max-w-md mx-auto";
+
     favoritesList.innerHTML = `
       <div>
         <p class="text-gray-600 text-lg font-semibold mb-2">No favorites yet.</p>
@@ -398,21 +453,22 @@ function displayFavorites() {
     return;
   }
 
-  favoritesList.className = favorites.length === 1 ? "flex flex-col items-center gap-4 w-full" : "grid grid-cols-1 md:grid-cols-2 gap-6 w-full";
+  favoritesList.className = "flex flex-col items-center gap-6 w-full max-w-md mx-auto";
 
   favorites.forEach((fav) => {
     const item = document.createElement("li");
-    item.className = "bg-stone-50 rounded shadow p-4 flex flex-col items-center relative text-red-600";
+    item.className =
+      "bg-white rounded-xl shadow-md p-6 flex flex-col items-center w-full max-w-md transition hover:shadow-lg hover:scale-[1.01] duration-200 animate-fade-in border-l-2 border-orange-400";
 
     item.innerHTML = `
-      <div class="flex justify-between items-start w-full">
-        <h3 class="text-lg font-bold text-center">${fav.name}</h3>
-        <button data-id="${fav.id}" class="remove-fav text-red-500 hover:text-red-700 text-xl ml-4">
-          <i class="bi bi-trash-fill"></i>
-        </button>
-      </div>
-      <img src="${fav.thumbnail}" alt="${fav.name}" class="rounded max-h-40 object-contain mt-2 cursor-pointer" />
-    `;
+    <div class="flex justify-between items-center w-full mb-2">
+      <h3 class="text-lg font-bold text-orange-600">${fav.name}</h3>
+      <button data-id="${fav.id}" class="remove-fav text-red-500 hover:text-red-700 text-xl">
+        <i class="bi bi-trash-fill"></i>
+      </button>
+    </div>
+    <img src="${fav.thumbnail}" alt="${fav.name}" class="rounded max-h-48 object-contain mt-2 cursor-pointer shadow" />
+  `;
 
     item.querySelector("img").addEventListener("click", () => {
       cameFrom = "favorites";
@@ -461,10 +517,34 @@ function switchPage(page) {
 // ======================
 // Event Listeners
 // ======================
+document.getElementById("logo-link")?.addEventListener("click", () => {
+  localStorage.setItem("lastPage", "start");
+  const lastRandomDrink = JSON.parse(localStorage.getItem("lastRandomDrink"));
+  if (lastRandomDrink) {
+    displayCocktail(lastRandomDrink);
+  } else {
+    fetchRandomCocktail();
+  }
+  switchPage("start");
+});
+
+document.getElementById("prev-cocktail").addEventListener("click", () => {
+  const previous = JSON.parse(localStorage.getItem("previousDrink"));
+  if (previous) {
+    displayCocktail(previous);
+  }
+});
+
 document.getElementById("search-form").addEventListener("submit", (e) => {
   e.preventDefault();
-  const cocktailName = document.getElementById("search-input").value.trim();
-  if (cocktailName) fetchCocktailsByName(cocktailName);
+  const name = document.getElementById("search-input").value.trim();
+  const ingredient = document.getElementById("ingredient-input")?.value.trim();
+
+  if (name) {
+    fetchCocktailsByName(name);
+  } else if (ingredient) {
+    fetchCocktailsByIngredient(ingredient);
+  }
 });
 
 document.getElementById("new-cocktail").addEventListener("click", fetchRandomCocktail);
@@ -510,16 +590,30 @@ document.getElementById("clear-search").addEventListener("click", () => {
 window.addEventListener("DOMContentLoaded", () => {
   hideLoader();
 
-  // 🔒 Göm mobilmeny säkert på laddning
+  // 🔒 Säkert startläge för mobilmenyn
   if (window.innerWidth < 640) {
+    navLinks?.classList.remove("mobile-menu-open");
     navLinks?.classList.add("hidden", "opacity-0", "translate-y-[-10px]");
-    navLinks?.classList.remove("opacity-100", "translate-y-0");
     menuOverlay?.classList.add("hidden", "opacity-0");
     menuOverlay?.classList.remove("opacity-100");
   } else {
-    navLinks?.classList.remove("hidden", "opacity-0", "translate-y-[-10px]");
+    navLinks?.classList.remove("hidden", "opacity-0", "translate-y-[-10px]", "mobile-menu-open");
     navLinks?.classList.add("opacity-100", "translate-y-0");
     menuOverlay?.classList.add("hidden", "opacity-0");
+
+    const scrollToTopBtn = document.getElementById("scroll-to-top");
+
+    window.addEventListener("scroll", () => {
+      if (window.scrollY > 300) {
+        scrollToTopBtn.classList.remove("hidden");
+      } else {
+        scrollToTopBtn.classList.add("hidden");
+      }
+    });
+
+    scrollToTopBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
   }
 
   // 🚀 Ladda rätt vy
