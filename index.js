@@ -445,10 +445,11 @@ function displayFavorites() {
     favoritesList.className = "flex flex-col items-center gap-6 w-full max-w-md mx-auto";
 
     favoritesList.innerHTML = `
-      <div>
-        <p class="text-gray-600 text-lg font-semibold mb-2">No favorites yet.</p>
-        <p class="text-gray-500 text-sm">Start adding some drinks!</p>
-      </div>
+      <div class="bg-orange-50 border border-orange-300 rounded-xl shadow-md p-6 flex flex-col items-center animate-fade-in">
+    <i class="bi bi-emoji-frown text-4xl text-orange-400 mb-3"></i>
+    <p class="text-gray-700 text-lg font-semibold mb-1">No favorites yet.</p>
+    <p class="text-gray-500 text-sm text-center">Start adding some drinks to fill this space with deliciousness!</p>
+  </div>
     `;
     return;
   }
