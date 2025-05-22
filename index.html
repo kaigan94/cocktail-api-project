@@ -96,10 +96,27 @@
         <div class="container flex flex-col items-center w-full max-w-5xl relative">
           <section id="start-page" class="page open flex flex-col items-center w-full">
             <div id="cocktail" class="flex flex-col items-center mb-8"></div>
-            <div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
-              <button id="details-link" class="btn-primary"><i class="bi bi-info-circle"></i> See More</button>
-              <button id="new-cocktail" class="btn-primary"><i class="bi bi-shuffle"></i> New Drink</button>
-              <button id="prev-cocktail" class="btn-primary"><i class="bi bi-arrow-left-circle"></i> Previous Drink</button>
+            <div class="w-full flex justify-center">
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-[90%] max-w-sm sm:max-w-xl">
+                <button
+                  id="details-link"
+                  class="flex items-center justify-center gap-2 text-white bg-orange-500 hover:bg-orange-600 transition px-5 py-3 rounded-xl font-semibold shadow-lg text-base"
+                >
+                  <i class="bi bi-info-circle"></i> See More
+                </button>
+                <button
+                  id="new-cocktail"
+                  class="flex items-center justify-center gap-2 text-white bg-orange-500 hover:bg-orange-600 transition px-5 py-3 rounded-xl font-semibold shadow-lg text-base"
+                >
+                  <i class="bi bi-shuffle"></i> New Drink
+                </button>
+                <button
+                  id="prev-cocktail"
+                  class="hidden flex items-center justify-center gap-2 text-orange-600 border border-orange-400 hover:bg-orange-100 transition px-5 py-3 rounded-xl font-semibold shadow text-base"
+                >
+                  <i class="bi bi-arrow-counterclockwise"></i> Previous Drink
+                </button>
+              </div>
             </div>
           </section>
 

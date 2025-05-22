@@ -135,6 +135,92 @@ logo?.addEventListener("click", () => {
 });
 
 // ======================
+// ✨ Style and logic for persistent HTML buttons
+// ======================
+window.addEventListener("DOMContentLoaded", () => {
+  hideLoader();
+
+  const detailsBtn = document.getElementById("details-link");
+  const newBtn = document.getElementById("new-cocktail");
+  const prevBtn = document.getElementById("prev-cocktail");
+
+  detailsBtn?.classList.add(
+    "flex",
+    "items-center",
+    "justify-center",
+    "gap-2",
+    "text-white",
+    "bg-orange-500",
+    "hover:bg-orange-600",
+    "transition",
+    "px-5",
+    "py-3",
+    "rounded-xl",
+    "font-semibold",
+    "shadow-lg",
+    "text-base"
+  );
+
+  newBtn?.classList.add(
+    "flex",
+    "items-center",
+    "justify-center",
+    "gap-2",
+    "text-white",
+    "bg-orange-500",
+    "hover:bg-orange-600",
+    "transition",
+    "px-5",
+    "py-3",
+    "rounded-xl",
+    "font-semibold",
+    "shadow-lg",
+    "text-base"
+  );
+
+  prevBtn?.classList.add(
+    "flex",
+    "items-center",
+    "justify-center",
+    "gap-2",
+    "text-orange-600",
+    "border",
+    "border-orange-400",
+    "hover:bg-orange-100",
+    "transition",
+    "px-5",
+    "py-3",
+    "rounded-xl",
+    "font-semibold",
+    "shadow",
+    "text-base"
+  );
+
+  detailsBtn?.addEventListener("click", () => {
+    const cocktailImg = document.querySelector("#cocktail img");
+    const drinkId = cocktailImg?.getAttribute("data-id");
+    if (drinkId) {
+      cameFrom = "start";
+      localStorage.setItem("lastPage", "details");
+      fetchCocktailDetailsById(drinkId);
+    }
+  });
+
+  newBtn?.addEventListener("click", fetchRandomCocktail);
+
+  prevBtn?.addEventListener("click", () => {
+    const previous = JSON.parse(localStorage.getItem("previousDrink"));
+    if (previous) {
+      displayCocktail(previous);
+    }
+  });
+
+  if (localStorage.getItem("previousDrink")) {
+    prevBtn?.classList.remove("hidden");
+  }
+});
+
+// ======================
 // Favorite Toggle Functions
 // ======================
 function toggleFavorite(cocktail, favIcon, favText, undoBtn) {
@@ -272,26 +358,39 @@ function displayCocktail(cocktail) {
   const cocktailDiv = document.getElementById("cocktail");
   const searchForm = document.getElementById("search-form");
   searchForm.style.display = "none";
+
   cocktailDiv.innerHTML = `
-  ${stylizeDrinkTitle(cocktail.strDrink)}
-  <img src="${cocktail.strDrinkThumb}" alt="${cocktail.strDrink}" data-id="${cocktail.idDrink}" class="rounded-xl shadow-md max-w-xs object-contain" />
-`;
+    ${stylizeDrinkTitle(cocktail.strDrink)}
+    <img src="${cocktail.strDrinkThumb}" alt="${cocktail.strDrink}" data-id="${cocktail.idDrink}" class="rounded-xl shadow-md max-w-xs object-contain mb-6" />
+  `;
+}
 
-  const detailsBtn = document.getElementById("details-link");
-  const handler = () => {
-    const cocktailImg = document.querySelector("#cocktail img");
-    if (!cocktailImg) return;
-    const drinkId = cocktailImg.getAttribute("data-id");
-    if (!drinkId) return;
-    cameFrom = "start";
-    localStorage.setItem("lastPage", "details");
-    fetchCocktailDetailsById(drinkId);
-  };
+const detailsBtn = document.getElementById("details-link");
+const newBtn = document.getElementById("new-cocktail");
+const prevBtn = document.getElementById("prev-cocktail");
 
-  // Rensa tidigare lyssnare med ett nytt element
-  const newDetailsBtn = detailsBtn.cloneNode(true);
-  detailsBtn.parentNode.replaceChild(newDetailsBtn, detailsBtn);
-  newDetailsBtn.addEventListener("click", handler);
+detailsBtn?.addEventListener("click", () => {
+  const cocktailImg = document.querySelector("#cocktail img");
+  if (!cocktailImg) return;
+  const drinkId = cocktailImg.getAttribute("data-id");
+  if (!drinkId) return;
+  cameFrom = "start";
+  localStorage.setItem("lastPage", "details");
+  fetchCocktailDetailsById(drinkId);
+});
+
+newBtn?.addEventListener("click", fetchRandomCocktail);
+
+prevBtn?.addEventListener("click", () => {
+  const previous = JSON.parse(localStorage.getItem("previousDrink"));
+  if (previous) {
+    displayCocktail(previous);
+  }
+});
+
+// Visa knappen om tidigare drink finns
+if (localStorage.getItem("previousDrink")) {
+  prevBtn?.classList.remove("hidden");
 }
 
 function displayCocktailDetails(cocktail) {
@@ -315,7 +414,7 @@ function displayCocktailDetails(cocktail) {
 
 
 <h2 class="text-xl font-bold text-orange-600 text-center pt-8">${cocktail.name}</h2>
-      <img src="${cocktail.thumbnail}" alt="${cocktail.name}" class="rounded-xl max-w-xs object-contain shadow mx-auto" />
+      <img src="${cocktail.thumbnail}" alt="${cocktail.name}" class="rounded-xl w-full max-w-[300px] object-contain shadow mx-auto px-4" />
 
       <div class="text-left w-full text-gray-800 space-y-2 text-sm">
   <div class="flex items-start gap-x-3">
