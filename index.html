@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="src/styles/styles.css" />
     <style>
       .page {
         opacity: 0;
@@ -32,157 +32,270 @@
     </style>
   </head>
 
-  <body class="min-h-screen bg-cover bg-center" style="background-image: url('orange-bg.jpg')">
-    <header class="bg-white shadow-sm sticky top-0 z-50 w-full">
-      <div class="w-full sm:max-w-6xl sm:mx-auto flex justify-between items-center px-4 py-4">
-        <div class="flex items-center">
-          <button id="logo-link" aria-label="Home">
-            <img class="h-24 w-auto cursor-pointer logo-hover" src="COCKTAIL.png" alt="Cocktail Explorer Logo" />
+  <body class="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-100/70">
+    <header class="sticky top-0 z-50 w-full border-b border-white/30 bg-white/45 backdrop-blur-lg">
+      <div class="relative mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-2 sm:py-3">
+        <div class="flex items-center gap-3">
+          <button id="logo-link" aria-label="Home" class="flex items-center">
+            <img class="h-16 w-auto cursor-pointer logo-hover sm:h-20" src="public/assets/logos/COCKTAIL.svg" alt="Cocktail Explorer Logo" />
           </button>
+          <div class="hidden sm:block">
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-orange-400">Cocktail Explorer</p>
+            <p class="text-sm font-medium text-orange-600/90">Sip, discover & repeat</p>
+          </div>
         </div>
-        <button id="menu-toggle" class="sm:hidden text-[#EA580B] text-3xl focus:outline-none">
+        <button
+          id="menu-toggle"
+          aria-expanded="false"
+          aria-controls="nav-links"
+          class="inline-flex h-10 w-10 items-center justify-center rounded-full border border-orange-200/70 text-[1.65rem] text-orange-500 shadow-sm transition hover:border-orange-300 hover:text-orange-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 sm:hidden"
+        >
           <i class="bi bi-list"></i>
         </button>
         <nav
           id="nav-links"
-          class="transition-all duration-300 ease-out opacity-0 translate-y-[-10px] hidden sm:!flex absolute sm:static top-[91px] left-30 right-1 w-auto sm:w-auto bg-white sm:bg-transparent shadow-lg sm:shadow-none z-40 rounded-xl px-4 py-2 sm:px-4 sm:py-0 flex-col sm:flex sm:flex-row items-baseline sm:items-baseline sm:space-x-4 space-y-2 text-left"
+          class="hidden opacity-0 translate-y-[-12px] absolute inset-x-4 top-[calc(100%+0.75rem)] z-40 overflow-hidden rounded-2xl border border-white/40 bg-white/25 p-3.5 shadow-xl shadow-orange-200/40 backdrop-blur-xl transition-all duration-300 ease-out sm:static sm:flex sm:items-center sm:gap-2 sm:rounded-full sm:border sm:border-white/40 sm:bg-white/20 sm:px-2 sm:py-1 sm:opacity-100 sm:translate-y-0 sm:shadow-sm"
         >
-          <button
-            id="start-link"
-            class="w-full sm:w-auto flex items-baseline gap-2 px-4 py-2 text-[#EA580B] font-semibold border border-transparent sm:border-none hover:bg-orange-50 rounded-lg transition text-left h-[42px]"
-          >
-            <i class="bi bi-house text-l"></i>
-            <span>Home</span>
-          </button>
-          <button
-            id="search-link"
-            class="w-full sm:w-auto flex items-baseline gap-2 px-4 py-2 text-[#EA580B] font-semibold border border-transparent sm:border-none hover:bg-orange-50 rounded-lg transition text-left h-[42px]"
-          >
-            <i class="bi bi-search text-l"></i>
-            <span>Search</span>
-          </button>
-          <button
-            id="favorites-link"
-            class="w-full sm:w-auto flex items-baseline gap-2 px-4 py-2 text-[#EA580B] font-semibold border border-transparent sm:border-none hover:bg-orange-50 rounded-lg transition text-left h-[42px]"
-          >
-            <i class="bi bi-heart text-l"></i>
-            <span>Favorites</span>
-          </button>
+          <div class="flex flex-col gap-1.5 sm:flex-row sm:items-center">
+            <button
+              type="button"
+              id="start-link"
+              data-page="start"
+              class="group flex w-full items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold text-orange-600 transition hover:bg-orange-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 sm:w-auto"
+            >
+              <i class="bi bi-house text-base text-orange-400 transition group-hover:text-orange-600"></i>
+              <span>Home</span>
+            </button>
+            <button
+              type="button"
+              id="search-link"
+              data-page="search"
+              class="group flex w-full items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold text-orange-600 transition hover:bg-orange-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 sm:w-auto"
+            >
+              <i class="bi bi-search text-base text-orange-400 transition group-hover:text-orange-600"></i>
+              <span>Search</span>
+            </button>
+            <button
+              type="button"
+              id="favorites-link"
+              data-page="favorites"
+              class="group flex w-full items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold text-orange-600 transition hover:bg-orange-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300 sm:w-auto"
+            >
+              <i class="bi bi-heart text-base text-orange-400 transition group-hover:text-orange-600"></i>
+              <span>Favorites</span>
+            </button>
+          </div>
         </nav>
       </div>
     </header>
 
-    <div id="menu-overlay" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-30 sm:hidden transition-opacity duration-300 opacity-0"></div>
-    <div class="mt-20 sm:mt-24"></div>
+    <div
+      id="menu-overlay"
+      class="hidden fixed inset-0 bg-gradient-to-br from-orange-500/15 via-orange-500/5 to-orange-600/20 backdrop-blur-md z-30 sm:hidden transition-opacity duration-300 opacity-0"
+    ></div>
 
-    <main class="flex flex-col items-center w-full relative z-10">
-      <div class="relative bg-white border border-orange-300 rounded-xl shadow-lg px-6 pt-10 pb-12 mb-20 w-full max-w-6xl flex flex-col items-center">
-        <button id="scroll-to-top" class="hidden fixed bottom-8 right-8 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded shadow transition z-50">
-          <i class="bi bi-arrow-up-circle"></i>
-          Back to Top
-        </button>
+    <main class="relative z-10 flex w-full justify-center px-4 pb-12 pt-0 sm:pt-4 sm:pb-12">
+      <div class="absolute inset-x-0 top-0 -z-10 h-[340px] bg-gradient-to-b from-orange-200/40 via-white to-transparent"></div>
+      <div class="absolute left-[12%] top-20 -z-10 h-64 w-64 rounded-full bg-orange-300/35 blur-3xl"></div>
+      <div class="absolute right-[10%] top-44 -z-10 h-64 w-64 rounded-full bg-orange-200/30 blur-3xl"></div>
 
-        <div id="loader" class="hidden">
-          <div class="glass">
-            <div class="bubble"></div>
-            <div class="bubble"></div>
-            <div class="bubble"></div>
-            <div class="bubble"></div>
-          </div>
+      <button
+        id="scroll-to-top"
+        class="hidden fixed bottom-8 right-8 z-50 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-orange-500 to-orange-600 px-4 py-2 text-sm font-semibold text-white shadow-xl shadow-orange-400/40 transition hover:translate-y-[-3px] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-200"
+      >
+        <i class="bi bi-arrow-up-circle"></i>
+        Back to Top
+      </button>
+
+      <div id="loader" class="hidden">
+        <div class="glass">
+          <div class="bubble"></div>
+          <div class="bubble"></div>
+          <div vi class="bubble"></div>
+          <div class="bubble"></div>
         </div>
+      </div>
 
-        <div id="error-message" class="hidden text-white bg-red-600 font-semibold p-4 rounded my-4 w-full text-center"></div>
+      <div class="w-full max-w-6xl space-y-16">
+        <div
+          id="error-message"
+          class="hidden rounded-2xl border border-red-200/70 bg-red-50/80 px-4 py-3 text-center text-sm font-semibold text-red-600 shadow-lg shadow-red-200/50"
+        ></div>
 
-        <div class="container flex flex-col items-center w-full max-w-5xl relative">
-          <section id="start-page" class="page open flex flex-col items-center w-full">
-            <div id="cocktail" class="flex flex-col items-center mb-8"></div>
-            <div class="w-full flex justify-center">
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-[90%] max-w-sm sm:max-w-xl">
-                <button
-                  id="details-link"
-                  class="flex items-center justify-center gap-2 text-white bg-orange-500 hover:bg-orange-600 transition px-5 py-3 rounded-xl font-semibold shadow-lg text-base"
+        <section id="start-page" class="page open w-full">
+          <div class="overflow-hidden rounded-3xl border border-white/60 bg-white/80 shadow-[0_45px_70px_-50px_rgba(234,88,12,0.6)] backdrop-blur">
+            <div class="relative grid gap-10 p-8 sm:p-10 lg:grid-cols-[minmax(0,3fr)_minmax(240px,2fr)]">
+              <div class="flex flex-col gap-6 text-center lg:text-left">
+                <span
+                  class="mx-auto inline-flex items-center gap-2 rounded-full border border-orange-200/70 bg-orange-100/60 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-orange-500 lg:mx-auto"
                 >
-                  <i class="bi bi-info-circle"></i> See More
-                </button>
-                <button
-                  id="new-cocktail"
-                  class="flex items-center justify-center gap-2 text-white bg-orange-500 hover:bg-orange-600 transition px-5 py-3 rounded-xl font-semibold shadow-lg text-base"
-                >
-                  <i class="bi bi-shuffle"></i> New Drink
-                </button>
-                <button
-                  id="prev-cocktail"
-                  class="hidden flex items-center justify-center gap-2 text-orange-600 border border-orange-400 hover:bg-orange-100 transition px-5 py-3 rounded-xl font-semibold shadow text-base"
-                >
-                  <i class="bi bi-arrow-counterclockwise"></i> Previous Drink
-                </button>
-              </div>
-            </div>
-          </section>
-
-          <section id="details-page" class="page hidden flex flex-col items-center w-full">
-            <div id="cocktail-details" class="w-full"></div>
-          </section>
-
-          <section id="search-page" class="page hidden w-full flex justify-center pt-6">
-            <div class="flex flex-col items-center bg-white rounded-xl shadow-xl border border-gray-200 px-6 py-8 w-full max-w-xl">
-              <form id="search-form" class="w-full flex flex-col gap-4 mb-4">
-                <div class="flex justify-between items-center w-full">
-                  <button type="button" id="clear-search" class="text-sm text-orange-600 underline hover:text-orange-800 transition">Clear</button>
+                  Featured Drink
+                </span>
+                <div id="cocktail" class="flex flex-col items-center gap-4 text-center text-slate-800"></div>
+                <p class="mx-auto max-w-2xl text-sm text-slate-500 lg:mx-0 lg:text-base">
+                  Explore handcrafted cocktails. Shuffle for a surprise sip, or drill into the details to learn the perfect pour.
+                </p>
+                <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <button
+                    id="details-link"
+                    class="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-6 py-3 text-base font-semibold text-white shadow-lg shadow-orange-400/40 transition-transform duration-200 hover:scale-[1.01] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300"
+                  >
+                    <i class="bi bi-info-circle text-lg"></i>
+                    See More
+                  </button>
+                  <button
+                    id="new-cocktail"
+                    class="flex items-center justify-center gap-2 rounded-2xl border border-orange-200/70 bg-white/80 px-6 py-3 text-base font-semibold text-orange-600 shadow-md shadow-orange-100/70 transition-transform duration-200 hover:scale-[1.01] hover:border-orange-300 hover:bg-orange-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-200"
+                  >
+                    <i class="bi bi-shuffle text-lg"></i>
+                    New Drink
+                  </button>
+                  <button
+                    id="prev-cocktail"
+                    class="hidden flex items-center justify-center gap-2 rounded-2xl border border-orange-200/70 bg-orange-50/60 px-6 py-3 text-base font-semibold text-orange-600 shadow-inner shadow-orange-100/50 transition-transform duration-200 hover:scale-[1.01]"
+                  >
+                    <i class="bi bi-arrow-counterclockwise text-lg"></i>
+                    Previous Drink
+                  </button>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-2 w-full items-end">
-                  <div class="flex flex-col sm:flex-row sm:items-end gap-3 w-full">
-                    <div class="relative w-full sm:w-1/2">
-                      <label for="search-input" class="block text-sm font-semibold text-orange-700 mb-1">Search By Name</label>
-                      <i class="bi bi-search absolute text-md left-3 top-8 text-gray-400 text-lg"></i>
-                      <input
-                        type="text"
-                        id="search-input"
-                        placeholder="enter cocktail"
-                        autocomplete="off"
-                        class="w-full pl-9 p-2.5 border border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 bg-gray-100 text-gray-800 shadow-sm"
-                      />
+              </div>
+
+              <div class="relative flex items-center justify-center">
+                <div class="absolute -top-8 right-4 h-44 w-44 rounded-full bg-orange-200/50 blur-3xl"></div>
+                <div
+                  class="relative w-full max-w-sm rounded-2xl border border-orange-200/70 bg-gradient-to-br from-white via-orange-50/80 to-white px-6 py-8 text-center shadow-lg shadow-orange-200/60"
+                >
+                  <p class="text-xs font-semibold uppercase tracking-[0.38em] text-orange-400">Mixology Tips</p>
+
+                  <p class="mt-3 text-sm text-slate-500">Refresh for endless variations or save favourites to craft your signature menu.</p>
+                  <div class="mt-6 flex flex-col gap-3 text-left text-sm text-slate-600">
+                    <div class="flex items-center gap-3 rounded-xl bg-white/70 px-4 py-3 shadow-inner shadow-orange-100/60">
+                      <i class="bi bi-droplet-half text-lg text-orange-500"></i>
+                      <span>Use ingredient or cocktail search to find your new favorite drink.</span>
                     </div>
-                    <div class="relative w-full sm:w-1/2">
-                      <label for="ingredient-input" class="block text-sm font-semibold text-orange-700 mb-1">Search By Ingredient</label>
-                      <i class="bi bi-search absolute left-3 top-[32px] text-gray-400 text-lg"></i>
-                      <input
-                        type="text"
-                        id="ingredient-input"
-                        placeholder="enter ingredient"
-                        class="w-full pl-9 p-2.5 border border-orange-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 bg-gray-100 text-gray-800 shadow-sm"
-                      />
-                    </div>
-                    <div class="sm:pt-6">
-                      <button
-                        type="submit"
-                        id="search-button"
-                        class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold px-4 py-2.5 rounded-md shadow transition"
-                      >
-                        <i class="bi bi-arrow-right-circle"></i>
-                        Search
-                      </button>
+                    <div class="flex items-center gap-3 rounded-xl bg-white/70 px-4 py-3 shadow-inner shadow-orange-100/60">
+                      <i class="bi bi-heart text-lg text-orange-500"></i>
+                      <span>Tap favourites to build a collection of your own.</span>
                     </div>
                   </div>
                 </div>
-              </form>
-              <ul id="search-results" class="w-full grid grid-cols-1 md:grid-cols-2 gap-4 mt-6"></ul>
+              </div>
             </div>
-          </section>
+          </div>
+        </section>
 
-          <section id="favorites-page" class="page hidden flex flex-col items-center w-full pt-8">
-            <h2 class="text-2xl font-bold text-orange-600 mb-6">My Favorites</h2>
-            <ul id="favorites-list" class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl text-center"></ul>
-          </section>
-        </div>
+        <section id="details-page" class="page hidden w-full">
+          <div
+            class="overflow-hidden rounded-3xl border border-white/60 bg-white/85 px-6 py-8 shadow-[0_40px_65px_-45px_rgba(234,88,12,0.55)] backdrop-blur sm:px-10 sm:py-10"
+          >
+            <div class="flex items-center justify-between border-b border-orange-100/80 pb-4">
+              <h2 class="text-xl font-semibold text-orange-600 sm:text-2xl">Cocktail Details</h2>
+              <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 text-orange-500">
+                <i class="bi bi-cup-straw text-lg"></i>
+              </span>
+            </div>
+            <div id="cocktail-details" class="relative mt-6 w-full"></div>
+          </div>
+        </section>
+
+        <section id="search-page" class="page hidden w-full">
+          <div class="overflow-hidden rounded-3xl border border-white/60 bg-white/85 shadow-[0_45px_70px_-50px_rgba(234,88,12,0.55)] backdrop-blur">
+            <div class="grid gap-10 p-8 sm:p-10 lg:grid-cols-[minmax(0,320px)_1fr]">
+              <div class="flex flex-col gap-6 rounded-2xl border border-orange-100/80 bg-white/90 p-6 shadow-inner shadow-orange-100/60">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.3em] text-orange-400">Search</p>
+                  <h3 class="mt-2 text-lg font-semibold text-orange-600">Find your next drink</h3>
+                  <p class="mt-2 text-sm text-slate-500">Search by cocktail name or spotlight a favourite ingredient to surface curated recipes instantly.</p>
+                </div>
+                <form id="search-form" class="flex flex-col gap-5">
+                  <div class="flex items-center justify-between">
+                    <button
+                      type="button"
+                      id="clear-search"
+                      class="text-xs font-semibold uppercase tracking-[0.2em] text-orange-500 underline underline-offset-4 transition hover:text-orange-600"
+                    >
+                      Clear filters
+                    </button>
+                  </div>
+                  <div class="space-y-5">
+                    <label class="flex flex-col gap-2 text-left">
+                      <span class="text-sm font-semibold text-orange-600">Search By Name</span>
+                      <div class="relative">
+                        <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-orange-300"></i>
+                        <input
+                          type="text"
+                          id="search-input"
+                          placeholder="enter cocktail"
+                          autocomplete="off"
+                          class="w-full rounded-xl border border-orange-200/70 bg-orange-50/40 py-2.5 pl-9 pr-3 text-sm text-slate-700 shadow-inner shadow-orange-100/60 focus:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-200"
+                        />
+                      </div>
+                    </label>
+                    <label class="flex flex-col gap-2 text-left">
+                      <span class="text-sm font-semibold text-orange-600">Search By Ingredient</span>
+                      <div class="relative">
+                        <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-orange-300"></i>
+                        <input
+                          type="text"
+                          id="ingredient-input"
+                          placeholder="enter ingredient"
+                          class="w-full rounded-xl border border-orange-200/70 bg-orange-50/40 py-2.5 pl-9 pr-3 text-sm text-slate-700 shadow-inner shadow-orange-100/60 focus:border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-200"
+                        />
+                      </div>
+                    </label>
+                  </div>
+                  <button
+                    type="submit"
+                    id="search-button"
+                    class="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-orange-500 to-orange-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-orange-400/40 transition hover:translate-y-[-2px] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-300"
+                  >
+                    <i class="bi bi-arrow-right-circle text-lg"></i>
+                    Search
+                  </button>
+                </form>
+              </div>
+
+              <div class="flex flex-col gap-6">
+                <div class="flex items-center justify-between rounded-2xl border border-orange-100/70 bg-white/70 px-5 py-4 shadow-inner shadow-orange-100/60">
+                  <h4 class="text-base font-semibold text-orange-600">Results</h4>
+                  <span class="text-sm text-orange-400">Tap a card to view details</span>
+                </div>
+                <ul id="search-results" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"></ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="favorites-page" class="page hidden w-full">
+          <div
+            class="overflow-hidden rounded-3xl border border-white/60 bg-white/85 px-6 py-8 shadow-[0_45px_70px_-50px_rgba(234,88,12,0.55)] backdrop-blur sm:px-10 sm:py-10"
+          >
+            <div class="flex flex-col gap-3 border-b border-orange-100/80 pb-5 text-center sm:text-left">
+              <p class="text-xs font-semibold uppercase tracking-[0.3em] text-orange-400">Favourites</p>
+              <h2 class="text-2xl font-semibold text-orange-600">Your curated bar cart</h2>
+              <p class="text-sm text-slate-500">Save cocktails you love and return anytime to mix, tweak, or share them with friends.</p>
+            </div>
+            <ul id="favorites-list" class="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2"></ul>
+          </div>
+        </section>
       </div>
     </main>
 
     <footer class="mt-auto text-center text-sm text-[#FF9129] flex flex-col items-center pb-4">
-      <p>Cocktail Explorer &copy; 2025</p>
-      <p class="mt-2 flex items-center justify-center gap-2">Powered by <img src="logo.png" alt="TheCocktailDB Logo" class="inline-block w-24" /></p>
+      <p>
+        Need help? Contact us
+        <a
+          href="mailto:kaigan.codes@gmail.com"
+          class="font-semibold text-orange-500 underline decoration-1 hover:text-orange-600 hover:decoration-solid transition"
+          >here</a
+        >
+      </p>
+      <p class="mt-2">Kaigan &copy; 2025</p>
+      <p class="mt-6 flex items-center justify-center gap-1">
+        Powered by<img src="public/assets/logos/logo.svg" alt="TheCocktailDB Logo" class="inline-block w-24" />
+      </p>
     </footer>
 
-    <script src="index.js" type="module"></script>
+    <script src="src/main.js" type="module"></script>
   </body>
 </html>

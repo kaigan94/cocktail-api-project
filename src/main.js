@@ -68,6 +68,48 @@ const pages = {
   favorites: document.querySelector("#favorites-page"),
 };
 
+const NAV_ACTIVE_CLASSES = ["bg-orange-500/15", "text-orange-700", "shadow-sm", "ring-1", "ring-orange-300/60"];
+
+const NAV_ICON_ACTIVE_CLASSES = ["text-orange-700"];
+const NAV_ICON_BASE_CLASSES = ["text-orange-400"];
+
+function highlightNavigation(page) {
+  if (!navButtons?.length) return;
+
+  const targetPage = page === "details" ? cameFrom : page;
+
+  navButtons.forEach((btn) => {
+    btn.classList.remove(...NAV_ACTIVE_CLASSES);
+    btn.setAttribute("aria-current", "false");
+
+    const icon = btn.querySelector("i");
+    icon?.classList.remove(...NAV_ICON_ACTIVE_CLASSES, ...NAV_ICON_BASE_CLASSES);
+    icon?.classList.add(...NAV_ICON_BASE_CLASSES);
+  });
+
+  const activeButton = Array.from(navButtons).find((btn) => btn.dataset.page === targetPage);
+  if (activeButton) {
+    activeButton.classList.add(...NAV_ACTIVE_CLASSES);
+    activeButton.setAttribute("aria-current", "page");
+
+    const icon = activeButton.querySelector("i");
+    icon?.classList.remove(...NAV_ICON_BASE_CLASSES);
+    icon?.classList.add(...NAV_ICON_ACTIVE_CLASSES);
+  }
+}
+
+function updateMobileMenuState(isOpen) {
+  if (!menuToggle) return;
+  const icon = menuToggle.querySelector("i");
+
+  if (icon) {
+    icon.classList.toggle("bi-x", isOpen);
+    icon.classList.toggle("bi-list", !isOpen);
+  }
+
+  menuToggle.setAttribute("aria-expanded", String(isOpen));
+}
+
 // ======================
 // Mobile Menu Event Listeners
 // ======================
@@ -79,11 +121,13 @@ menuToggle?.addEventListener("click", () => {
     navLinks?.classList.add("mobile-menu-open");
     menuOverlay?.classList.remove("hidden", "opacity-0");
     setTimeout(() => menuOverlay?.classList.add("opacity-100"), 10);
+    updateMobileMenuState(true);
   } else {
     navLinks?.classList.remove("mobile-menu-open");
     setTimeout(() => navLinks?.classList.add("hidden"), 300);
     menuOverlay?.classList.remove("opacity-100");
     setTimeout(() => menuOverlay?.classList.add("hidden", "opacity-0"), 300);
+    updateMobileMenuState(false);
   }
 });
 
@@ -94,29 +138,41 @@ document.addEventListener("click", (e) => {
   const isOpen = window.innerWidth < 640 && !navLinks?.classList.contains("hidden");
 
   if (!isInsideMenu && !isToggleButton && !isLogo && isOpen) {
-    navLinks?.classList.add("opacity-0", "translate-y-[-10px]");
+    navLinks?.classList.remove("mobile-menu-open");
+    navLinks?.classList.add("opacity-0", "translate-y-[-12px]");
     setTimeout(() => navLinks?.classList.add("hidden"), 300);
     menuOverlay?.classList.remove("opacity-100");
     setTimeout(() => menuOverlay?.classList.add("hidden", "opacity-0"), 300);
+    updateMobileMenuState(false);
   }
 });
 
 navButtons?.forEach((btn) => {
   btn.addEventListener("click", () => {
     if (window.innerWidth < 640) {
-      navLinks?.classList.add("opacity-0", "translate-y-[-10px]");
+      navLinks?.classList.remove("mobile-menu-open");
+      navLinks?.classList.add("opacity-0", "translate-y-[-12px]");
       setTimeout(() => navLinks?.classList.add("hidden"), 300);
       menuOverlay?.classList.remove("opacity-100");
       setTimeout(() => menuOverlay?.classList.add("hidden", "opacity-0"), 300);
+      updateMobileMenuState(false);
     }
+
+    highlightNavigation(btn.dataset.page || "start");
   });
 });
 
 window.addEventListener("resize", () => {
   if (window.innerWidth >= 640) {
-    navLinks?.classList.remove("hidden", "opacity-0", "translate-y-[-10px]");
+    navLinks?.classList.remove("hidden", "opacity-0", "translate-y-[-12px]", "mobile-menu-open");
     navLinks?.classList.add("opacity-100", "translate-y-0");
     menuOverlay?.classList.add("hidden", "opacity-0");
+    updateMobileMenuState(false);
+  } else {
+    navLinks?.classList.remove("mobile-menu-open");
+    navLinks?.classList.add("hidden", "opacity-0", "translate-y-[-12px]");
+    menuOverlay?.classList.add("hidden", "opacity-0");
+    updateMobileMenuState(false);
   }
 });
 
@@ -361,7 +417,7 @@ function displayCocktail(cocktail) {
 
   cocktailDiv.innerHTML = `
     ${stylizeDrinkTitle(cocktail.strDrink)}
-    <img src="${cocktail.strDrinkThumb}" alt="${cocktail.strDrink}" data-id="${cocktail.idDrink}" class="rounded-xl shadow-md max-w-xs object-contain mb-6" />
+    <img src="${cocktail.strDrinkThumb}" alt="${cocktail.strDrink}" data-id="${cocktail.idDrink}" class="mx-auto mb-6 w-full max-w-[220px] rounded-xl object-contain shadow-md" />
   `;
 }
 
@@ -512,11 +568,16 @@ function displaySearchResults(cocktails) {
 
   cocktails.forEach((cocktail) => {
     const item = document.createElement("li");
-    item.className = "bg-stone-50 rounded shadow p-4 flex flex-col items-center animate-fade-in cursor-pointer hover:shadow-lg transition";
+    item.className =
+      "group relative flex cursor-pointer flex-col items-center gap-4 rounded-2xl border border-orange-100/70 bg-white/80 p-5 text-center shadow-lg shadow-orange-100/60 transition hover:-translate-y-1 hover:shadow-orange-200/80 animate-fade-in";
 
     item.innerHTML = `
-      <h3 class="text-lg font-bold text-center mb-2">${cocktail.strDrink}</h3>
-      <img src="${cocktail.strDrinkThumb}" alt="${cocktail.strDrink}" class="rounded max-h-40 object-contain mb-2" />
+      <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 text-orange-500 shadow-inner shadow-orange-200/60">
+        <i class="bi bi-cup-straw text-lg"></i>
+      </span>
+      <h3 class="text-lg font-semibold text-orange-600">${cocktail.strDrink}</h3>
+      <img src="${cocktail.strDrinkThumb}" alt="${cocktail.strDrink}" class="rounded-2xl border border-orange-100/70 bg-white/70 p-2 shadow-inner shadow-orange-100/60" />
+      <p class="text-sm text-slate-500">Tap to view recipe →</p>
     `;
 
     item.addEventListener("click", () => {
@@ -531,7 +592,11 @@ function displaySearchResults(cocktails) {
 
 function displayNoResults() {
   const resultsDiv = document.getElementById("search-results");
-  resultsDiv.innerHTML = "<li class='text-gray-600'>No cocktails found.</li>";
+  resultsDiv.innerHTML =
+    '<li class="flex flex-col items-center gap-3 rounded-2xl border border-orange-100/70 bg-white/80 p-6 text-center text-sm font-semibold text-orange-500 shadow-inner shadow-orange-100/60">' +
+    '<i class="bi bi-search text-2xl text-orange-400"></i>' +
+    "<span>No cocktails found. Try another keyword.</span>" +
+    "</li>";
 }
 
 function displayFavorites() {
@@ -541,33 +606,38 @@ function displayFavorites() {
   favoritesList.innerHTML = "";
 
   if (favorites.length === 0) {
-    favoritesList.className = "flex flex-col items-center gap-6 w-full max-w-md mx-auto";
+    favoritesList.className = "mt-8 flex flex-col items-center gap-8 w-full max-w-2xl mx-auto";
 
     favoritesList.innerHTML = `
-      <div class="bg-orange-50 border border-orange-300 rounded-xl shadow-md p-6 flex flex-col items-center animate-fade-in">
-    <i class="bi bi-emoji-frown text-4xl text-orange-400 mb-3"></i>
-    <p class="text-gray-700 text-lg font-semibold mb-1">No favorites yet.</p>
-    <p class="text-gray-500 text-sm text-center">Start adding some drinks to fill this space with deliciousness!</p>
-  </div>
+      <div class="flex flex-col items-center gap-3 rounded-3xl border border-orange-100/70 bg-white/85 px-8 py-10 text-center shadow-lg shadow-orange-100/60 animate-fade-in">
+        <span class="inline-flex h-14 w-14 items-center justify-center rounded-full bg-orange-100 text-orange-500 shadow-inner shadow-orange-200/60">
+          <i class="bi bi-emoji-frown text-2xl"></i>
+        </span>
+        <p class="text-lg font-semibold text-orange-600">No favourites yet</p>
+        <p class="max-w-md text-sm text-slate-500">
+          Save a cocktail from the search or details pages to build a personalised tasting list.
+        </p>
+      </div>
     `;
     return;
   }
 
-  favoritesList.className = "flex flex-col items-center gap-6 w-full max-w-md mx-auto";
+  favoritesList.className = "mt-8 grid w-full gap-6 sm:grid-cols-2 lg:grid-cols-3";
 
   favorites.forEach((fav) => {
     const item = document.createElement("li");
     item.className =
-      "bg-white rounded-xl shadow-md p-6 flex flex-col items-center w-full max-w-md transition hover:shadow-lg hover:scale-[1.01] duration-200 animate-fade-in border-l-2 border-orange-400";
+      "group relative flex w-full flex-col items-center gap-4 rounded-2xl border border-orange-100/70 bg-white/85 p-6 text-center shadow-lg shadow-orange-100/60 transition hover:-translate-y-1 hover:shadow-orange-200/80 animate-fade-in";
 
     item.innerHTML = `
-    <div class="flex justify-between items-center w-full mb-2">
-      <h3 class="text-lg font-bold text-orange-600">${fav.name}</h3>
-      <button data-id="${fav.id}" class="remove-fav text-red-500 hover:text-red-700 text-xl">
-        <i class="bi bi-trash-fill"></i>
-      </button>
-    </div>
-    <img src="${fav.thumbnail}" alt="${fav.name}" class="rounded max-h-48 object-contain mt-2 cursor-pointer shadow" />
+      <div class="flex w-full items-center justify-between">
+        <h3 class="text-lg font-semibold text-orange-600">${fav.name}</h3>
+        <button data-id="${fav.id}" class="remove-fav inline-flex h-10 w-10 items-center justify-center rounded-full bg-red-50 text-red-500 transition hover:bg-red-100">
+          <i class="bi bi-trash-fill"></i>
+        </button>
+      </div>
+      <img src="${fav.thumbnail}" alt="${fav.name}" class="w-full max-h-48 rounded-2xl border border-orange-100/70 bg-white/70 p-2 shadow-inner shadow-orange-100/60 cursor-pointer" />
+      <p class="text-sm text-slate-500">Tap the image for more details</p>
   `;
 
     item.querySelector("img").addEventListener("click", () => {
@@ -607,11 +677,11 @@ function switchPage(page) {
   });
 
   const searchForm = document.getElementById("search-form");
-  if (page === "search") {
-    searchForm.style.display = "flex";
-  } else {
-    searchForm.style.display = "none";
+  if (searchForm) {
+    searchForm.style.display = page === "search" ? "flex" : "none";
   }
+
+  highlightNavigation(page);
 }
 
 // ======================
@@ -693,11 +763,11 @@ window.addEventListener("DOMContentLoaded", () => {
   // 🔒 Säkert startläge för mobilmenyn
   if (window.innerWidth < 640) {
     navLinks?.classList.remove("mobile-menu-open");
-    navLinks?.classList.add("hidden", "opacity-0", "translate-y-[-10px]");
+    navLinks?.classList.add("hidden", "opacity-0", "translate-y-[-12px]");
     menuOverlay?.classList.add("hidden", "opacity-0");
     menuOverlay?.classList.remove("opacity-100");
   } else {
-    navLinks?.classList.remove("hidden", "opacity-0", "translate-y-[-10px]", "mobile-menu-open");
+    navLinks?.classList.remove("hidden", "opacity-0", "translate-y-[-12px]", "mobile-menu-open");
     navLinks?.classList.add("opacity-100", "translate-y-0");
     menuOverlay?.classList.add("hidden", "opacity-0");
 
@@ -715,6 +785,8 @@ window.addEventListener("DOMContentLoaded", () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
     });
   }
+
+  updateMobileMenuState(false);
 
   // 🚀 Ladda rätt vy
   const lastPage = localStorage.getItem("lastPage") || "start";
